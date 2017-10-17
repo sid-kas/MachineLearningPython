@@ -1,6 +1,10 @@
 import numpy as np
-import nn
 
 
-x = [-10,10,20]
-
+j = []
+x = np.array([-10,10,20])
+l = x + 1
+j.append(x)
+j.append(l)
+k = j[0]
+l = 0
