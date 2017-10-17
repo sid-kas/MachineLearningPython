@@ -1,5 +1,6 @@
 import numpy as np
 
+# Activation functions
 def Sigmoid(x):
     xNumpy = np.array(x)
     return 1/(1+np.exp(-xNumpy))
@@ -23,5 +24,7 @@ ReLU_Gradient = lambda x: list(map(lambda x: 1 if x>0 else 0,x))
 
 LeakyReLU = lambda x,a: list(map(lambda x: x if x>0 else a*x,x))
 LeakyReLU_GRadient = lambda x,a: list(map(lambda x: 1 if x>0 else a*1,x))
+
+
 
 
