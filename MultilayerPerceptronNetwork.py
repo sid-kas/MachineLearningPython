@@ -1,5 +1,5 @@
 import numpy as np
-import nn
+import nn_Utilities as nn
 
 def Train_MLP(inputPatterns, targetOutputs, eta = 0.01, architecture = {'hiddenLayers': 4,'respectiveHiddenUnits':[6,5,7,4]}, batchSize = 100, outputClasses = 1):
     checkData = 10**2
