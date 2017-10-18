@@ -1,5 +1,7 @@
 import numpy as np
 
+k = np.arange(10-1,-1,-1)
+
 
 j = []
 x = np.array([-10,10,20])

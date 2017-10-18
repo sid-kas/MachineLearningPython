@@ -53,22 +53,89 @@ def Initialize_weights(inputDimensions,outputClasses,architecture = {'hiddenLaye
         weightMatrix = weights(input_hidden,hidden_output)
         return weightMatrix
 
-def FeedForward(inputPatterns,weightMatrix, architecture = {'hiddenLayers': 2,'respectiveHiddenUnits':[4,4]}):
+
+def FeedForward(inputPatterns,weightMatrix, architecture = {'hiddenLayers': 2,'respectiveHiddenUnits':[4,4]},returnType = 1):
     nlayers = architecture['hiddenLayers']
     hiddenUnits = architecture['respectiveHiddenUnits']
     w = weightMatrix.input_hidden
     b = []
+    V = []
     b.append(np.add(np.dot(inputPatterns,w['weights']), w['bias']))
-    V = Tanh(b[0])
+    output = Tanh(b[0])
+    V.append(output)
 
     if(nlayers > 1):
         for n in range(0,nlayers-1):
             w = weightMatrix.hidden_hidden[n]
-            b.append(np.add(np.dot(V,w['weights']), w['bias']))
-            V = Tanh(b[n+1])
+            b.append(np.add(np.dot(output,w['weights']), w['bias']))
+            output = Tanh(b[n+1])
+            V.append(output)
     
     w = weightMatrix.hidden_output
-    b.append(np.add(np.dot(V,w['weights']), w['bias']))
-    output = Tanh(b[nlayers])
+    b.append(np.add(np.dot(output,w['weights']), w['bias']))
+    V.append(Tanh(b[nlayers]))
+    if(returnType == 1):
+        return V, b
+    else:
+        output = V.pop()
+        return output
 
-    return output, b
+
+def GetGradients(outputs,b,weightMatrix,xCurrent,yCurrent):
+    deltaW = []
+    deltaB = []
+    nb = len(b)-1
+    w1 = weightMatrix.input_hidden    
+    w2 = weightMatrix.hidden_hidden
+    w3 = weightMatrix.hidden_output
+
+    tempDelta = (yCurrent - outputs[nb])*Tanh_Gradient(b[nb])
+    deltaB.append(np.sum(tempDelta,axis=0)/np.size(tempDelta,axis=0))
+    deltaW.append(np.dot(np.transpose(outputs[nb-1]),tempDelta))
+    
+   
+    tempDeltab =np.dot(np.transpose(np.dot(tempDelta,np.transpose(w3['bias']))),Tanh_Gradient(b[nb-1]))
+    deltaB.append(tempDeltab)    
+
+    tempDelta = np.dot(tempDelta,np.transpose(w3['weights']))*Tanh_Gradient(b[nb-1])
+    deltaW.append(np.dot(np.transpose(outputs[nb-2]),tempDelta))   
+    k = 2
+    for n in range(len(w2)-1,-1,-1):
+        w = w2[n]
+        tempDeltab = np.dot(np.transpose(np.dot(tempDelta,np.transpose(w['bias']))),Tanh_Gradient(b[nb-k]))
+        deltaB.append(tempDeltab) 
+        tempDelta = np.dot(tempDelta,np.transpose(w['weights']))*Tanh_Gradient(b[nb-k])
+        if(nb-k-1 >=0):
+            deltaW.append(np.dot(np.transpose(outputs[nb-k-1]),tempDelta))     
+        else:
+            deltaW.append(np.dot(np.transpose(xCurrent),tempDelta))  
+        k += 1
+
+    return deltaW, deltaB
+
+
+def UpdateWeights(weightMatrix, deltaW, deltaB,eta = 0.01):
+    w = []
+    w.append(weightMatrix.input_hidden)    
+    for item in weightMatrix.hidden_hidden:
+        w.append(item)
+    w.append(weightMatrix.hidden_output)
+    w.reverse()
+
+    for n in range(0,len(deltaW)):
+        wCurrent = w[n]
+        wCurrent['weights'] = wCurrent['weights'] + eta*deltaW[n]
+        wCurrent['bias'] = wCurrent['bias'] + eta*deltaB[n]
+    
+    input_hidden = w.pop()
+    hidden_hidden = []
+    for n in range(0,len(w)-1,1):
+        hidden_hidden.append(w.pop())
+    hidden_output = w.pop()
+
+    weightMatrix = weights(input_hidden,hidden_output,hidden_hidden)
+    return weightMatrix
+
+
+
+    
