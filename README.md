@@ -8,10 +8,12 @@ Hey there!
     - Tensorflow test cases for MLP comparision
     - k-means clustering algorithm
 - Future plans:
+    - testing the current codes with large data sets
     - Adam optimiser
     - CURE clustering algorithm
     - convnet vs hybrid net with RBF
     - Nueralgas unsupervised learning
-    - LSTM and GRU's in RNN
-   
+    - LSTM and GRU's in RNNS
+    - Spiking neuron model applied to DNN and RNN
+    - MLP with PSO instead of BackPropagation to optimize weights.
 
