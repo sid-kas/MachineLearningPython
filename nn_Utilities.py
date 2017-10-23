@@ -34,12 +34,13 @@ ReLU_Gradient = lambda x: list(map(lambda x: 1 if x>0 else 0,x))
 LeakyReLU = lambda x,a: list(map(lambda x: x if x>0 else a*x,x))
 LeakyReLU_GRadient = lambda x,a: list(map(lambda x: 1 if x>0 else a*1,x))
 
-def DynamicPlot(data1,data2):
+def DynamicPlot(data1,data2 = None):
     plt.ion()
-    plt.plot(flatten(data1),label = 'Training data')
-    plt.plot(flatten(data2),label = 'Validation data')
+    plt.plot(data1,label = 'Training data')
+    if data2 != None:
+        plt.plot(flatten(data2),label = 'Validation data')
     plt.xlabel('Iterations')
-    plt.ylabel('Energy')
+    plt.ylabel('Error')
     plt.legend()
     plt.pause(0.05)
     plt.clf()
@@ -47,8 +48,8 @@ def DynamicPlot(data1,data2):
 
 def EucledianDistance(x, weightMatrix):
     w = weightMatrix    
-    # shapeW = np.shape(w)
     term1 = np.reshape(np.sum(np.square(w),axis=1),(1,-1)) + np.reshape(np.sum(np.square(x),axis=1),(-1,1))
+    # shapeW = np.shape(w)
     # wTranspose = np.reshape(flatten(zip(*w)),(shapeW[1],shapeW[0]))
     term2 = 2*np.dot(x,np.transpose(w))
     eucledianDistance = term1 - term2      
