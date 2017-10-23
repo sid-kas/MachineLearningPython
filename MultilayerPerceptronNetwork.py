@@ -1,15 +1,18 @@
 import numpy as np
+import matplotlib.pyplot as plt
 import nn_Utilities as nn
 
-def Train_MLP(inputPatterns, targetOutputs, eta = 0.01, architecture = {'hiddenLayers': 4,'respectiveHiddenUnits':[6,5,7,4]}, batchSize = 100, outputClasses = 1):
+def Train_MLP(trainingData,validationData, targetOutputs, eta = 0.01, architecture = {'hiddenLayers': 4,'respectiveHiddenUnits':[6,5,7,4]}, batchSize = 100, outputClasses = 1):
     checkData = 10**2
     updates = 10**5
-    nPatterns = np.size(inputPatterns,axis = 0)
-    inputDimensions = np.size(inputPatterns,axis = 1)
+    nPatterns = np.size(trainingData,axis = 0)
+    inputDimensions = np.size(trainingData,axis = 1)
     weightMatrix = nn.Initialize_weights(inputDimensions,outputClasses,architecture)
+    energyTraining = []
+    energyValiation = []
     for n in range(0,updates):
         j = np.random.random_integers(0,nPatterns-1,batchSize)
-        xCurrent = inputPatterns[j]
+        xCurrent = trainingData[j]
         yCurrent = targetOutputs[j]
 
         (outputs, b) = nn.FeedForward(xCurrent, weightMatrix, architecture)
@@ -19,8 +22,11 @@ def Train_MLP(inputPatterns, targetOutputs, eta = 0.01, architecture = {'hiddenL
         weightMatrix = nn.UpdateWeights(weightMatrix, deltaW, deltaB,eta) # To do: update weights with adam optimizer
 
         if n%checkData == 0:
-            testOutput = nn.FeedForward(inputPatterns,weightMatrix,architecture,returnType = 2)
-            H = np.array((targetOutputs-testOutput)**2).sum()/(2*nPatterns)
+            testOutput = nn.FeedForward(trainingData,weightMatrix,architecture,returnType = 2)
+            validOutput = nn.FeedForward(validationData,weightMatrix,architecture,returnType = 2)
+            energyTraining.append(np.array((targetOutputs-testOutput)**2).sum()/(2*nPatterns))
+            energyValiation.append(np.array((targetOutputs-validOutput)**2).sum()/(2*nPatterns))
+            nn.DynamicPlot(energyTraining,energyValiation)
             print(n,' Upadtes completed out of', updates,', Energy: ',H)
     return weightMatrix
 
