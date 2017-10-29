@@ -3,8 +3,8 @@ import matplotlib.pyplot as plt
 import nn_Utilities as nn
 
 def Train_MLP(trainingData, targetOutputs, validationData = None, eta = 0.01, architecture = {'hiddenLayers': 4,'respectiveHiddenUnits':[6,5,7,4]}, batchSize = 100, outputClasses = 1):
-    checkData = 10
-    updates = 10**5
+    checkData = 100
+    updates = 2*10**3
     nPatterns = np.size(trainingData,axis = 0)
     inputDimensions = np.size(trainingData,axis = 1)
     weightMatrix = nn.Initialize_weights(inputDimensions,outputClasses,architecture)
