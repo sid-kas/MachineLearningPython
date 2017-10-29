@@ -2,8 +2,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import nn_Utilities as nn
 
-def Train_MLP(trainingData,validationData, targetOutputs, eta = 0.01, architecture = {'hiddenLayers': 4,'respectiveHiddenUnits':[6,5,7,4]}, batchSize = 100, outputClasses = 1):
-    checkData = 10**2
+def Train_MLP(trainingData, targetOutputs, validationData = None, eta = 0.01, architecture = {'hiddenLayers': 4,'respectiveHiddenUnits':[6,5,7,4]}, batchSize = 100, outputClasses = 1):
+    checkData = 10
     updates = 10**5
     nPatterns = np.size(trainingData,axis = 0)
     inputDimensions = np.size(trainingData,axis = 1)
@@ -23,10 +23,12 @@ def Train_MLP(trainingData,validationData, targetOutputs, eta = 0.01, architectu
 
         if n%checkData == 0:
             testOutput = nn.FeedForward(trainingData,weightMatrix,architecture,returnType = 2)
-            validOutput = nn.FeedForward(validationData,weightMatrix,architecture,returnType = 2)
-            energyTraining.append(np.array((targetOutputs-testOutput)**2).sum()/(2*nPatterns))
-            energyValiation.append(np.array((targetOutputs-validOutput)**2).sum()/(2*nPatterns))
-            nn.DynamicPlot(energyTraining,energyValiation)
+            H = np.array((targetOutputs-testOutput)**2).sum()/(2*nPatterns)
+            energyTraining.append(H)
+            if validationData is not None:
+                validOutput = nn.FeedForward(validationData,weightMatrix,architecture,returnType = 2)
+                energyValiation.append(np.array((targetOutputs-validOutput)**2).sum()/(2*nPatterns))
+                nn.DynamicPlot(energyTraining)
             print(n,' Upadtes completed out of', updates,', Energy: ',H)
     return weightMatrix
 

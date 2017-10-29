@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from numba import jit
 
 class weights:
     def __init__(self,input_hidden,hidden_output,hidden_hidden = None):
@@ -44,7 +45,6 @@ def DynamicPlot(data1,data2 = None):
     plt.legend()
     plt.pause(0.05)
     plt.clf()
-
 
 def EucledianDistance(x, weightMatrix):
     w = weightMatrix    
