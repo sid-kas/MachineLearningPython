@@ -1,10 +1,16 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import nn_Utilities as nn
+import pickle
 
-def Train_MLP(trainingData, targetOutputs, validationData = None, eta = 0.01, architecture = {'hiddenLayers': 4,'respectiveHiddenUnits':[6,5,7,4]}, batchSize = 100, outputClasses = 1):
+class g:
+      relu = 'relu'  
+      tanh = 'tanh'
+      sigmoid = 'sigmoid'
+      leakyRelu = 'leaky_relu'
+
+def Train_MLP(trainingData, targetOutputs, activation = g.tanh , updates = 2*10**3, validationData = None, eta = 0.01, architecture = {'hiddenLayers': 4,'respectiveHiddenUnits':[6,5,7,4]}, batchSize = 100, outputClasses = 1):
     checkData = 100
-    updates = 2*10**3
     nPatterns = np.size(trainingData,axis = 0)
     inputDimensions = np.size(trainingData,axis = 1)
     weightMatrix = nn.Initialize_weights(inputDimensions,outputClasses,architecture)
@@ -15,9 +21,9 @@ def Train_MLP(trainingData, targetOutputs, validationData = None, eta = 0.01, ar
         xCurrent = trainingData[j]
         yCurrent = targetOutputs[j]
 
-        (outputs, b) = nn.FeedForward(xCurrent, weightMatrix, architecture)
+        (outputs, b) = nn.FeedForward(xCurrent, weightMatrix, architecture, activationFunction = activation)
 
-        (deltaW, deltaB) = nn.GetGradients(outputs, b, weightMatrix, xCurrent, yCurrent)
+        (deltaW, deltaB) = nn.GetGradients(outputs, b, weightMatrix, xCurrent, yCurrent, activationFunction = activation)
         
         weightMatrix = nn.UpdateWeights(weightMatrix, deltaW, deltaB,eta) # To do: update weights with adam optimizer
 
@@ -40,4 +46,13 @@ def Test_MLP(testPatterns,testOutputs,weightMatrix,architecture = {'hiddenLayers
     print('Energy: ',H)
     return H
 
+# trainingData  = np.loadtxt('RBF_data.txt')
+# y = np.reshape(trainingData[:,0],(-1,1))
 
+# readFile = open("gaussianOutput.pickle","rb")
+# inputData = pickle.load(readFile)
+# readFile.close() 
+# inputSupervised = np.transpose(inputData)
+
+# arch = {'hiddenLayers': 3,'respectiveHiddenUnits':[4,4,8]}
+# w2 = Train_MLP(trainingData=inputSupervised,targetOutputs=y,activation=g.sigmoid,batchSize=100,eta=0.01,architecture=arch,outputClasses=1,updates = 10**4)
