@@ -3,6 +3,7 @@
 *.zip
 *.pyc
 *.csv
+*.vscode/
 .vscode/.ropeproject/objectdb
 *.DS_Store
 *.pdf

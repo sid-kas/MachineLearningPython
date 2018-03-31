@@ -62,19 +62,7 @@ def Stochastic_K_means(inputData,inputDimensions,nClusters=5,updates=10**5,batch
     
     return weightMatrix
 
- 
-# f = open('activity/1.csv','r')
-# reader = csv.reader(f, delimiter=",")
-# x = list(reader)
-# result = np.array(x).astype("float")
-# f.close()
 
-# print(len(result))
-# print(np.shape(result))
-
-# x = np.random.rand(50000,5000)
-# cProfile.run('Stochastic_K_means(x,k = 1000, checkData = 50)')
-# w = Stochastic_K_means(x,k = 100, checkData = 50)
 
 def Kohonen_Network(x,outputShape = {'x': 10, 'y': None}):
 

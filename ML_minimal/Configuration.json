@@ -1,0 +1,69 @@
+{
+    "configMLP": {
+        "activationFunction" : "tanh",
+        "updates" : 10.0E+4,
+        "validationData": false,
+        "learningRate": 0.01,
+        "architecture": {
+            "hiddenLayers": 3,
+            "hiddenUnits": [64, 32, 32]
+        },
+        "batchSize": 20,
+        "checkData": true,
+        "checkDataAt": 500,
+        "dataNormalization": false,
+        "validationDataSize": 0.3,
+        "weightsRange": [-1, 1],
+        "optimizer": "adam",
+        "adamOptimizer": {
+            "alpha": 0.0001,
+            "beta1": 0.9,
+            "beta2": 0.999,
+            "epsilon": 10.0E-8
+        },
+        "dataShuffle": true,
+        "weightMatrixFileName": "weightMatrixMLP.pickle"
+    },
+    "configLSTM": {
+        "updates" : 20.0E+3,
+        "architecture": {
+            "hiddenLayers": 1,
+            "hiddenUnits": 16
+        },
+        "batchSize": 1,
+        "windowSize": 7,
+        "checkData": true,
+        "dataNormalization": false,
+        "testDataSize": 0.3,
+        "weightsRange": [-1, 1],
+        "optimizer": "adam",
+        "adamOptimizer": {
+            "alpha": 0.0001,
+            "beta1": 0.9,
+            "beta2": 0.999,
+            "epsilon": 10.0E-8
+        },
+        "dataShuffle": true
+    },
+    "configMultilayerLSTM": {
+        "updates" : 10.0E+8,
+        "architecture": {
+            "hiddenLayers": 2,
+            "hiddenUnits": [16,16]
+        },
+        "batchSize": 1,
+        "windowSize": 3,
+        "checkData": true,
+        "dataNormalization": false,
+        "testDataSize": 0.3,
+        "weightsRange": [-1, 1],
+        "optimizer": "SGD",
+        "adamOptimizer": {
+            "alpha": 0.0001,
+            "beta1": 0.9,
+            "beta2": 0.999,
+            "epsilon": 10.0E-8
+        },
+        "dataShuffle": false
+    }
+}

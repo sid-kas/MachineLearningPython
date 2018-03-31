@@ -1,60 +1,18 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from numba import jit
+import pickle
+
+class g:
+      relu = 'relu'  
+      tanh = 'tanh'
+      sigmoid = 'sigmoid'
+      leakyRelu = 'leaky_relu'
 
 class weights:
     def __init__(self,input_hidden,hidden_output,hidden_hidden = None):
         self.input_hidden = input_hidden
         self.hidden_output = hidden_output
         self.hidden_hidden = hidden_hidden 
-
-
-flatten = lambda l: [item for sublist in l for item in sublist]
-
-def softmax(x):
-    x_exp = np.exp(np.array(x,dtype=float),dtype=float)
-    x_exp_sum = np.sum(x_exp,axis = 1)
-    return x_exp/x_exp_sum[:,None]
-
-# Activation functions
-def Sigmoid(x):
-    xNumpy = np.array(x)
-    return 1/(1+np.exp(-xNumpy))
-def Sigmoid_Gradient(x):
-    return Sigmoid(x)*(1 - Sigmoid(x))
-
-def Tanh(x,beta=0.5):
-    xNumpy = np.array(x)
-    return np.tanh(beta*xNumpy)
-def Tanh_Gradient(x,beta=0.5):
-    return beta*(1-(np.square(Tanh(x,beta))))
-
-def SoftPlus(x):
-    xNumpy = np.array(x)
-    return np.log(1 + np.exp(xNumpy))
-def SoftPlus_Gradient(x):
-    return Sigmoid(x)
-
-def relu(x):
-    xNumpy = np.array(x)
-    xNumpy[xNumpy<0] = 0
-    return xNumpy
-def relu_grad(x):
-    xNumpy = np.array(x)
-    xNumpy[xNumpy>0] = 1
-    xNumpy[xNumpy<=0] = 0
-    return xNumpy
-
-def leaky_relu(x,a=0.01):
-    xNumpy = np.array(x,dtype=np.float64)
-    xNumpy[xNumpy<0] = xNumpy[xNumpy<0]*a
-    return xNumpy
-def leaky_relu_grad(x,a=0.01):
-    xNumpy = np.array(x,dtype=np.float64)
-    xNumpy[xNumpy>0] = 1
-    xNumpy[xNumpy<0] = a
-    return xNumpy
-
 
 class activations:
     def __init__(self,type):
@@ -71,31 +29,41 @@ class activations:
             self.activation = leaky_relu
             self.activation_Grad = leaky_relu_grad
 
-ReLU = lambda x: list(map(lambda x: x if x>0 else 0,x))
-ReLU_Gradient = lambda x: list(map(lambda x: 1 if x>0 else 0,x))
+def Train_MLP(trainingData, targetOutputs, activation = g.tanh , updates = 2*10**3, validationData = None, eta = 0.01, architecture = {'hiddenLayers': 4,'respectiveHiddenUnits':[6,5,7,4]}, batchSize = 100, outputClasses = 1):
+    checkData = 100
+    nPatterns = np.size(trainingData,axis = 0)
+    inputDimensions = np.size(trainingData,axis = 1)
+    weightMatrix = Initialize_weights(inputDimensions,outputClasses,architecture)
+    energyTraining = []
+    energyValiation = []
+    for n in range(0,updates):
+        j = np.random.random_integers(0,nPatterns-1,batchSize)
+        xCurrent = trainingData[j]
+        yCurrent = targetOutputs[j]
 
-LeakyReLU = lambda x,a: list(map(lambda x: x if x>0 else a*x,x))
-LeakyReLU_GRadient = lambda x,a: list(map(lambda x: 1 if x>0 else a*1,x))
+        (outputs, b) = FeedForward(xCurrent, weightMatrix, architecture, activationFunction = activation)
 
-def DynamicPlot(data1,data2 = None):
-    plt.ion()
-    plt.plot(data1,label = 'Training data')
-    if data2 != None:
-        plt.plot(flatten(data2),label = 'Validation data')
-    plt.xlabel('Iterations')
-    plt.ylabel('Error')
-    plt.legend()
-    plt.pause(0.05)
-    plt.clf()
+        (deltaW, deltaB) = GetGradients(outputs, b, weightMatrix, xCurrent, yCurrent, activationFunction = activation)
+        
+        weightMatrix = UpdateWeights(weightMatrix, deltaW, deltaB,eta) # To do: update weights with adam optimizer
 
-def EucledianDistance(x, weightMatrix):
-    w = weightMatrix    
-    term1 = np.reshape(np.sum(np.square(w),axis=1),(1,-1)) + np.reshape(np.sum(np.square(x),axis=1),(-1,1))
-    # shapeW = np.shape(w)
-    # wTranspose = np.reshape(flatten(zip(*w)),(shapeW[1],shapeW[0]))
-    term2 = 2*np.dot(x,np.transpose(w))
-    eucledianDistance = term1 - term2      
-    return eucledianDistance
+        if n%checkData == 0:
+            testOutput = FeedForward(trainingData,weightMatrix,architecture,returnType = 2)
+            H = np.array((targetOutputs-testOutput)**2).sum()/(2*nPatterns)
+            energyTraining.append(H)
+            if validationData is not None:
+                validOutput = FeedForward(validationData,weightMatrix,architecture,returnType = 2)
+                energyValiation.append(np.array((targetOutputs-validOutput)**2).sum()/(2*nPatterns))
+            print(n,' Upadtes completed out of', updates,', Energy: ',H)
+    return weightMatrix
+
+
+def Test_MLP(testPatterns,testOutputs,weightMatrix,architecture = {'hiddenLayers': 4,'respectiveHiddenUnits':[6,5,7,4]}):
+    nPatterns = np.size(testPatterns,axis = 0)
+    output_FeedForward = FeedForward(testPatterns,weightMatrix,architecture,returnType = 2)
+    H = np.array((testOutputs-output_FeedForward)**2).sum()/(2*nPatterns)
+    print('Energy: ',H)
+    return H
 
 
 def Initialize_weights(inputDimensions,outputClasses,architecture = {'hiddenLayers': 2,'respectiveHiddenUnits':[4,4]}):
@@ -205,7 +173,3 @@ def UpdateWeights(weightMatrix, deltaW, deltaB,eta = 0.01):
 
     weightMatrix = weights(input_hidden,hidden_output,hidden_hidden)
     return weightMatrix
-
-
-
-    
