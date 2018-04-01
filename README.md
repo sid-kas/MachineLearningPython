@@ -1,4 +1,4 @@
-# Deep learning with python
+# Machine learning with python
 Hey there!
 - I'll be posting all my work related to new algorithms I have learnt related to neural networks.
 - The codes here are build from scratch i.e. only using numpy unless mentioned otherwise
